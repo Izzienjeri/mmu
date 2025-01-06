@@ -7,10 +7,15 @@
 
 void displayAvailableRooms(const std::vector<Room>& rooms) {
     std::cout << "Available Rooms:\n";
+    bool foundAvailable = false;
     for (const auto& room : rooms) {
         if (room.isAvailable) {
             room.displayDetails();
+            foundAvailable = true;
         }
+    }
+    if (!foundAvailable) {
+        std::cout << "No rooms are available at the moment.\n";
     }
 }
 
@@ -27,33 +32,69 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
     int roomNumber;
     std::string customerName, startDate, endDate;
 
-    std::cout << "Enter room number to book: ";
+    // Show available rooms
+    displayAvailableRooms(rooms);
+
+    std::cout << "\n";
+
+    // Room selection with validation
+    std::cout << "Enter the room number you want to book: ";
     std::cin >> roomNumber;
-    std::cout << "Enter customer name: ";
-    std::cin >> customerName;
-    std::cout << "Enter start date (YYYY-MM-DD): ";
-    std::cin >> startDate;
-    std::cout << "Enter end date (YYYY-MM-DD): ";
-    std::cin >> endDate;
 
     bool roomAvailable = false;
     for (auto& room : rooms) {
         if (room.roomNumber == roomNumber && room.isAvailable) {
             roomAvailable = true;
-            room.isAvailable = false;
+            room.isAvailable = false; // Mark room as booked
             break;
         }
     }
 
-    if (roomAvailable) {
-        int bookingId = bookings.size() + 1;
-        int customerId = customers.size() + 1;
-        customers.push_back(Customer(customerId, customerName, "Unknown"));
-        bookings.push_back(Booking(bookingId, roomNumber, customerName, startDate, endDate));
-        std::cout << "Booking confirmed!\n";
-    } else {
-        std::cout << "Sorry, the room is not available.\n";
+    if (!roomAvailable) {
+        std::cout << "Sorry, the room is not available. Please select another room.\n";
+        return;
     }
+
+    // Customer details input
+    std::cout << "Enter customer name: ";
+    std::cin >> customerName;
+
+    // Date validation (Start Date)
+    while (true) {
+        std::cout << "Enter start date (YYYY-MM-DD): ";
+        std::cin >> startDate;
+
+        if (!isDateValid(startDate)) {
+            std::cout << "Invalid date format! Please use YYYY-MM-DD format. Try again: ";
+        } else if (isDateInPast(startDate)) {
+            std::cout << "The start date cannot be in the past. Please enter a valid start date.\n";
+        } else {
+            break; // Exit loop if date is valid
+        }
+    }
+
+    // Date validation (End Date)
+    while (true) {
+        std::cout << "Enter end date (YYYY-MM-DD): ";
+        std::cin >> endDate;
+
+        if (!isDateValid(endDate)) {
+            std::cout << "Invalid date format! Please use YYYY-MM-DD format. Try again: ";
+        } else if (isDateInPast(endDate)) {
+            std::cout << "The end date cannot be in the past. Please enter a valid end date.\n";
+        } else if (!isEndDateAfterStartDate(startDate, endDate)) {
+            std::cout << "End date must be after the start date. Please enter valid dates.\n";
+        } else {
+            break; // Exit loop if date is valid
+        }
+    }
+
+    // Add customer and booking
+    int bookingId = bookings.size() + 1;
+    int customerId = customers.size() + 1;
+    customers.push_back(Customer(customerId, customerName, "Unknown"));
+    bookings.push_back(Booking(bookingId, roomNumber, customerName, startDate, endDate));
+    std::cout << "Booking confirmed!\n";
 }
 
 void addRoom(std::vector<Room>& rooms) {
@@ -98,7 +139,7 @@ void addRoom(std::vector<Room>& rooms) {
 
     // Room Price Validation
     while (true) {
-        std::cout << "Enter room price per night: Ksh";
+        std::cout << "Enter room price per night (positive value): Ksh ";
         std::cin >> price;
         if (price <= 0) {
             std::cout << "Price must be a positive number. Try again.\n";
@@ -117,12 +158,20 @@ int main() {
     std::vector<Booking> bookings;
     std::vector<Customer> customers;
 
+    // Adding predefined rooms
     rooms.push_back(Room(101, "Single", 100.0, true));
     rooms.push_back(Room(102, "Double", 150.0, true));
+    rooms.push_back(Room(103, "Suite", 200.0, true));
+    rooms.push_back(Room(104, "Single", 120.0, true));
+    rooms.push_back(Room(105, "Double", 180.0, true));
+    rooms.push_back(Room(106, "Suite", 250.0, true));
 
     int choice;
     while (true) {
+        std::cout << "\nMenu:\n";
         std::cout << "1. Add Room\n2. Make Booking\n3. View Available Rooms\n4. Exit\n";
+        std::cout << "\n";
+        std::cout << "Enter your choice: ";
         std::cin >> choice;
 
         switch (choice) {
@@ -135,6 +184,7 @@ int main() {
                 break;
 
             case 3:
+                std::cout << "\n";
                 displayAvailableRooms(rooms);
                 break;
 
@@ -143,7 +193,7 @@ int main() {
                 return 0;
 
             default:
-                std::cout << "Invalid choice, try again.\n";
+                std::cout << "Invalid choice, please try again.\n";
         }
     }
 
