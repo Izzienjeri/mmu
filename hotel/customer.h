@@ -10,7 +10,7 @@ public:
     std::string contactInfo;
 
     Customer(int id, const std::string& name, const std::string& contact);
-    void displayDetails();
+    void displayDetails() const;
 };
 
 #endif

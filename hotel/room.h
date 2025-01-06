@@ -12,6 +12,7 @@ public:
 
     Room(int number, const std::string& type, double price, bool available);
     void displayDetails() const;
+    void bookRoom();  // Handles booking logic
 };
 
 #endif
