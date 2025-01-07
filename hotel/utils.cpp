@@ -86,7 +86,7 @@ bool login(bool isAdminLogin) {
     std::unordered_map<std::string, std::pair<std::string, bool>> userDatabase = {
         {"user1", {"pass1", false}},  // Normal user
         {"user2", {"pass2", false}},  // Normal user
-        {"admin", {"adminpass", true}}  // Admin user
+        {"admin", {"pass", true}}  // Admin user
     };
     std::string username, password;
     std::cout << "Enter username: ";

@@ -6,17 +6,6 @@
 #include "customer.h"
 #include "utils.h"
 
-// Predefined admin credentials
-const std::string ADMIN_USERNAME = "admin";
-const std::string ADMIN_PASSWORD = "Njeri";
-
-// User database with predefined users and admin
-std::unordered_map<std::string, std::pair<std::string, bool>> userDatabase = {
-    {"user1", {"pass1", false}},  // Normal user
-    {"user2", {"pass2", false}},  // Normal user
-    {ADMIN_USERNAME, {ADMIN_PASSWORD, true}}  // Admin user
-};
-
 
 int main() {
     std::vector<Room> rooms;
@@ -53,13 +42,40 @@ int main() {
                 break;
             }
 
-            case 2: {  // Login as Admin
-                loggedIn = login(true); // Pass true for admin login
+           case 2: {
+              // Login as Admin
+            loggedIn = login(true); // Pass true for admin login
                 if (loggedIn) {
                     isAdmin = true;
+                    while (isAdmin) {
+                        showAdminMenu();
+                        std::cout << "Enter your choice: ";
+                        std::cin >> actionChoice;
+
+                        switch (actionChoice) {
+                            case 1:  // Add Room
+                                addRoom(rooms);
+                                break;
+                            case 2:  // Mark Room Available
+                                markRoomAvailable(rooms);
+                                break;
+                            case 3:  // View Available Rooms
+                                displayAvailableRooms(rooms);
+                                break;
+                            case 4:  // Exit Admin Menu
+                                std::cout << "Logging out as Admin...\n";
+                                isAdmin = false;
+                                loggedIn = false;
+                                break;
+                            default:
+                                std::cout << "Invalid choice. Please try again.\n";
+                                break;
+                        }
+                    }
                 }
-                break;
-            }
+            break;
+        }
+
 
             case 3: {  // Sign Up
                 signup();
