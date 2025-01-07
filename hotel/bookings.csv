@@ -1,0 +1,4 @@
+customerName,bookingId,roomNumber,startDate,endDate
+John Doe,1,101,2025-01-01,2025-01-08
+Jane Smith,2,103,2025-01-02,2025-01-09
+user,4,102,2025-01-09,2025-01-10

@@ -6,6 +6,8 @@
 #include <fstream> // For file operations
 #include <sstream> // For string stream
 #include <vector>
+#include <limits>
+
 
 
 // 🛏️ Utility function definitions
@@ -86,60 +88,65 @@ void showUserMenu() {
     std::cout << "3. Exit 🚪\n";
 }
 
-bool login(bool isAdminLogin) {
-    std::unordered_map<std::string, std::pair<std::string, bool>> userDatabase = {
-        {"user1", {"pass1", false}},  // Normal user
-        {"user2", {"pass2", false}},  // Normal user
-        {"admin", {"pass", true}}  // Admin user
-    };
+bool login(bool isAdminLogin, const std::vector<Customer>& customers) {
     std::string username, password;
     std::cout << "Enter username: ";
     std::cin >> username;
 
-    if (userDatabase.find(username) == userDatabase.end()) {
-        std::cout << "No such account found. Please sign up first (if a normal user) 📝.\n";
-        return false;
-    }
-
     std::cout << "Enter password: ";
     std::cin >> password;
 
+    // Check if it's admin login
     if (isAdminLogin) {
-        if (userDatabase[username].second && userDatabase[username].first == password) {
-            std::cout << "Login successful as Admin 👑.\n";
+        // Hardcoded admin credentials
+        if (username == "admin" && password == "pass") {
+            std::cout << "Admin login successful. Welcome, Admin!\n";
             return true;
         } else {
-            std::cout << "Incorrect admin credentials ❌.\n";
+            std::cout << "Invalid admin credentials. Please try again.\n";
             return false;
         }
     } else {
-        if (!userDatabase[username].second && userDatabase[username].first == password) {
-            std::cout << "Login successful 👌.\n";
-            return true;
-        } else {
-            std::cout << "Incorrect username or password ❌.\n";
-            return false;
+        // User login
+        for (const auto& customer : customers) {
+            // Make sure to compare username and password correctly
+            if (toLower(customer.name) == toLower(username) && customer.password == password) {
+                std::cout << "User login successful. Welcome, " << username << "!\n";
+                return true;
+            }
         }
+        std::cout << "Invalid username or password. Please try again.\n";
+        return false;
     }
 }
 
-void signup() {
-    std::unordered_map<std::string, std::pair<std::string, bool>> userDatabase;
-    std::string username, password;
-    std::cout << "Enter new username: ";
-    std::cin >> username;
 
-    if (userDatabase.find(username) != userDatabase.end()) {
-        std::cout << "Username already exists. Please choose another one 🚫.\n";
-        return;
-    }
 
-    std::cout << "Enter password: ";
-    std::cin >> password;
+void signup(std::vector<Customer>& customers) {
+    std::string name, contact, password;
+    static int idCounter = customers.size() + 1;  // Adjust to avoid ID collision
 
-    userDatabase[username] = {password, false};
-    std::cout << "User account created successfully ✅.\n";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear the input buffer
+    std::cout << "Enter your username: ";
+    std::getline(std::cin, name);
+
+    std::cout << "Enter your contact info: ";
+    std::getline(std::cin, contact);
+
+    std::cout << "Enter your password: ";
+    std::getline(std::cin, password);
+
+    // Add customer to the list
+    customers.push_back(Customer(idCounter++, name, contact, password));
+
+    // Save the new customer to the CSV file
+    Customer::saveCustomersToFile(customers, "customers.csv");
+
+    std::cout << "Welcome, " << name << "! You have been registered successfully.\n";
 }
+
+
+
 
 void addRoom(std::vector<Room>& rooms) {
     int roomNumber;
@@ -222,13 +229,12 @@ void printBookingConfirmation(int bookingId, const std::string& customerName, in
     std::cout << "==================== Thank you for booking with us! 🙏 ====================\n\n";
 }
 
-void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::vector<Customer>& customers) {
+void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::vector<Customer>& customers, const std::string& userName) {
     int roomNumber;
-    std::string customerName, startDate, endDate;
+    std::string startDate, endDate;
 
     // Show available rooms
     displayAvailableRooms(rooms);
-    
     std::cout << "\n";
 
     // Room selection with validation
@@ -240,20 +246,19 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
     for (auto& room : rooms) {
         if (room.roomNumber == roomNumber && room.isAvailable) {
             roomAvailable = true;
-            roomPrice = room.pricePerNight; // Store price of selected room 💸
-            room.isAvailable = false; // Mark room as booked ✅
+            roomPrice = room.pricePerNight; // Store price of selected room
+            room.isAvailable = false; // Mark room as booked
             break;
         }
     }
 
     if (!roomAvailable) {
-        std::cout << "Sorry, the room is not available. Please select another room 💡.\n";
+        std::cout << "Sorry, the room is not available. Please select another room.\n";
         return;
     }
 
-    // Customer details input
-    std::cout << "Enter customer name: ";
-    std::cin >> customerName;
+    // Use logged-in username instead of asking for name
+    std::string customerName = userName;
 
     // Date validation
     std::cout << "Enter start date (YYYY-MM-DD): ";
@@ -289,20 +294,35 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
     time_t end = mktime(&tmEnd);
     double totalPrice = difftime(end, start) / (60 * 60 * 24) * roomPrice;
 
-    // Add customer and booking
+    // Generate booking ID
     int bookingId = bookings.size() + 1;
-    int customerId = customers.size() + 1;
-    customers.push_back(Customer(customerId, customerName, "Unknown"));
+
+    // Add booking to the bookings vector
     bookings.push_back(Booking(bookingId, roomNumber, customerName, startDate, endDate));
 
     // Print booking confirmation and receipt
-    std::cout << "\n==================== Booking Confirmation 🏨 ====================\n";
-    std::cout << "Booking ID: " << bookingId << "\n";
-    std::cout << "Customer Name: " << customerName << "\n";
-    std::cout << "Room Number: " << roomNumber << "\n";
-    std::cout << "Room Type: " << (roomPrice == 100.0 ? "Single 🛏️" : (roomPrice == 150.0 ? "Double 🛏️🛏️" : "Suite 🏨")) << "\n";
-    std::cout << "Check-in Date: " << startDate << "\n";
-    std::cout << "Check-out Date: " << endDate << "\n";
-    std::cout << "Total Price: Ksh " << totalPrice << " 💸\n";
-    std::cout << "==================== Thank you for booking with us! 🙏 ====================\n\n";
+    printBookingConfirmation(bookingId, customerName, roomNumber, 
+                              (roomPrice == 100.0 ? "Single" : (roomPrice == 150.0 ? "Double" : "Suite")),
+                              startDate, endDate, totalPrice);
+
+    // Update bookings.csv file
+    std::ofstream bookingsFile("bookings.csv", std::ios::app);
+    if (bookingsFile.is_open()) {
+        bookingsFile << customerName << "," << bookingId << "," << roomNumber << "," << startDate << "," << endDate << "\n";
+        bookingsFile.close();
+    } else {
+        std::cout << "Error opening bookings.csv file.\n";
+    }
+
+    // Update rooms.csv file
+    std::ofstream roomsFile("rooms.csv");
+    if (roomsFile.is_open()) {
+        for (const auto& room : rooms) {
+            roomsFile << room.roomNumber << "," << room.type << "," << room.pricePerNight 
+                      << "," << (room.isAvailable ? 1 : 0) << "\n";
+        }
+        roomsFile.close();
+    } else {
+        std::cout << "Error opening rooms.csv file.\n";
+    }
 }

@@ -1,4 +1,6 @@
-RoomNumber,Type,PricePerNight,IsAvailable
-101,Single,5000,1
-102,Double,7500,1
-103,Suite,12000,1
+101,Single,100,0
+102,Double,150,0
+103,Suite,200,0
+104,Single,100,1
+105,Double,150,1
+106,Suite,200,1

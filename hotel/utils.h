@@ -17,10 +17,12 @@ bool isRoomNumberValid(int roomNumber, const std::vector<Room>& rooms);
 
 void showAdminMenu();
 void showUserMenu();
-bool login(bool isAdminLogin);
-void signup();
+bool login(bool isAdminLogin, const std::vector<Customer>& customers);
+void signup(std::vector<Customer>& customers); 
 void addRoom(std::vector<Room>& rooms);
 void markRoomAvailable(std::vector<Room>& rooms);
-void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::vector<Customer>& customers);
+
+// Updated makeBooking function declaration with an additional parameter for user ID
+void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::vector<Customer>& customers, const std::string& userId);
 
 #endif

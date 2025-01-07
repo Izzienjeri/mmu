@@ -41,7 +41,6 @@ std::vector<Room> loadRoomsFromCSV(const std::string& filename) {
     return rooms;
 }
 
-
 void saveRoomsToCSV(const std::string& filename, const std::vector<Room>& rooms) {
     std::ofstream file(filename);
     if (!file.is_open()) {
