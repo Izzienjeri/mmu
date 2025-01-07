@@ -2,6 +2,7 @@
 #define ROOM_H
 
 #include <string>
+#include <vector>
 
 class Room {
 public:
@@ -10,9 +11,13 @@ public:
     double pricePerNight;
     bool isAvailable;
 
-    Room(int number, const std::string& type, double price, bool available);
-    void displayDetails() const;
-    void bookRoom();  
+    // Constructor to initialize Room with all parameters
+    Room(int roomNumber, const std::string& type, double pricePerNight, bool isAvailable)
+        : roomNumber(roomNumber), type(type), pricePerNight(pricePerNight), isAvailable(isAvailable) {}
 };
 
-#endif
+// Function declarations
+std::vector<Room> loadRoomsFromCSV(const std::string& filename);
+void saveRoomsToCSV(const std::string& filename, const std::vector<Room>& rooms);
+
+#endif // ROOM_H

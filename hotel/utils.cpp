@@ -3,6 +3,10 @@
 #include <cctype>
 #include <ctime>
 #include <unordered_map>
+#include <fstream> // For file operations
+#include <sstream> // For string stream
+#include <vector>
+
 
 // 🛏️ Utility function definitions
 
