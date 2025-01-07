@@ -111,7 +111,7 @@ int main() {
                             break;
 
                         case 2:  // Mark Room Available
-                            markRoomAvailable(rooms);
+                            markRoomAvailable(rooms, bookings);
                             saveRoomsToCSV("rooms.csv", rooms);
                             break;
 

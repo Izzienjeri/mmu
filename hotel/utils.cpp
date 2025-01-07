@@ -199,7 +199,7 @@ void addRoom(std::vector<Room>& rooms) {
     std::cout << "Room added successfully! 🎉\n";
 }
 
-void markRoomAvailable(std::vector<Room>& rooms) {
+void markRoomAvailable(std::vector<Room>& rooms, std::vector<Booking>& bookings) {
     std::cout << "\n**** Unavailable Rooms ****\n";
     
     // Display rooms that are unavailable
@@ -226,8 +226,34 @@ void markRoomAvailable(std::vector<Room>& rooms) {
     bool roomFound = false;
     for (auto& room : rooms) {
         if (room.roomNumber == roomNumber && !room.isAvailable) {
-            room.isAvailable = true;
+            room.isAvailable = true; // Mark room as available
             std::cout << "Room " << roomNumber << " is now available ✔️.\n";
+            
+            // Remove booking associated with the room
+            for (auto it = bookings.begin(); it != bookings.end(); ) {
+                if (it->roomNumber == roomNumber) {
+                    std::cout << "Booking for room " << roomNumber << " has been canceled.\n";
+                    it = bookings.erase(it); // Remove booking from the list
+                } else {
+                    ++it;
+                }
+            }
+            
+            // Update bookings.csv after removing booking
+            std::ofstream bookingsFile("bookings.csv");
+            if (bookingsFile.is_open()) {
+                for (const auto& booking : bookings) {
+                    bookingsFile << booking.customerName << ","
+                                 << booking.bookingId << ","
+                                 << booking.roomNumber << ","
+                                 << booking.startDate << ","
+                                 << booking.endDate << "\n";
+                }
+                bookingsFile.close();
+            } else {
+                std::cout << "Error opening bookings.csv file.\n";
+            }
+
             roomFound = true;
             break;
         }
@@ -236,7 +262,22 @@ void markRoomAvailable(std::vector<Room>& rooms) {
     if (!roomFound) {
         std::cout << "Room number not found or already available ❌.\n";
     }
+
+    // Update rooms.csv file
+    std::ofstream roomsFile("rooms.csv");
+    if (roomsFile.is_open()) {
+        for (const auto& room : rooms) {
+            roomsFile << room.roomNumber << ","
+                      << room.type << ","
+                      << room.pricePerNight << ","
+                      << (room.isAvailable ? 1 : 0) << "\n";
+        }
+        roomsFile.close();
+    } else {
+        std::cout << "Error opening rooms.csv file.\n";
+    }
 }
+
 
 void printBookingConfirmation(int bookingId, const std::string& customerName, int roomNumber, 
                                const std::string& roomType, const std::string& startDate, 

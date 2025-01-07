@@ -1,7 +1,7 @@
 RoomNumber,Type,PricePerNight,IsAvailable
 101,Double,150,1
 102,Double,150,0
-103,Suite,200,0
+103,Suite,200,1
 104,Single,100,1
 105,Double,150,1
 106,Suite,200,1
