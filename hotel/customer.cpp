@@ -4,16 +4,16 @@
 #include <sstream>
 #include <vector>
 
-// Constructor
+
 Customer::Customer(int id, const std::string& name, const std::string& contact, const std::string& password)
     : id(id), name(name), contactInfo(contact), password(password) {}
 
-// Display details
+
 void Customer::displayDetails() const {
     std::cout << "Customer ID: " << id << "\nName: " << name << "\nContact: " << contactInfo << "\n";
 }
 
-// Save customers to file
+
 void Customer::saveCustomersToFile(const std::vector<Customer>& customers, const std::string& filename) {
     std::ofstream outFile(filename);
     if (!outFile) {
@@ -28,7 +28,7 @@ void Customer::saveCustomersToFile(const std::vector<Customer>& customers, const
     outFile.close();
 }
 
-// Load customers from file
+
 std::vector<Customer> Customer::loadCustomersFromFile(const std::string& filename) {
     std::vector<Customer> customers;
     std::ifstream inFile(filename);

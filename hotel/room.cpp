@@ -14,14 +14,14 @@ std::vector<Room> loadRoomsFromCSV(const std::string& filename) {
         return rooms;
     }
 
-    // Skip the header line
+    
     std::getline(file, line);
 
     while (std::getline(file, line)) {
         std::istringstream iss(line);
         std::string token;
 
-        // Read data
+        
         std::getline(iss, token, ',');
         int roomNumber = std::stoi(token);
         std::getline(iss, token, ',');
@@ -31,7 +31,7 @@ std::vector<Room> loadRoomsFromCSV(const std::string& filename) {
         std::getline(iss, token, ',');
         bool isAvailable = token == "1";
 
-        // Initialize room with the required parameters
+        
         Room room(roomNumber, type, pricePerNight, isAvailable);
 
         rooms.push_back(room);
@@ -48,7 +48,7 @@ void saveRoomsToCSV(const std::string& filename, const std::vector<Room>& rooms)
         return;
     }
 
-    // Write header
+    
     file << "RoomNumber,Type,PricePerNight,IsAvailable\n";
 
     for (const auto& room : rooms) {

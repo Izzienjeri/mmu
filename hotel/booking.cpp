@@ -4,11 +4,11 @@
 #include <sstream>
 #include <vector>
 
-// Constructor
+
 Booking::Booking(int id, int room, const std::string& customer, const std::string& start, const std::string& end)
     : bookingId(id), roomNumber(room), customerName(customer), startDate(start), endDate(end) {}
 
-// Display details of the booking
+
 void Booking::displayDetails() const {
     std::cout << "Booking ID: " << bookingId
               << "\nRoom: " << roomNumber
@@ -16,7 +16,7 @@ void Booking::displayDetails() const {
               << "\nFrom: " << startDate << " to " << endDate << "\n";
 }
 
-// Load bookings from a CSV file
+
 std::vector<Booking> Booking::loadBookingsFromCSV(const std::string& filename) {
     std::vector<Booking> bookings;
     std::ifstream file(filename);
@@ -29,9 +29,9 @@ std::vector<Booking> Booking::loadBookingsFromCSV(const std::string& filename) {
         
         std::getline(ss, customer, ',');
         ss >> id;
-        ss.ignore();  // Ignore comma
+        ss.ignore();  
         ss >> room;
-        ss.ignore();  // Ignore comma
+        ss.ignore();  
         std::getline(ss, start, ',');
         std::getline(ss, end, ',');
 
@@ -41,7 +41,7 @@ std::vector<Booking> Booking::loadBookingsFromCSV(const std::string& filename) {
     return bookings;
 }
 
-// Save bookings to a CSV file
+
 void Booking::saveBookingsToCSV(const std::string& filename, const std::vector<Booking>& bookings) {
     std::ofstream file(filename);
     

@@ -3,14 +3,14 @@
 #include <cctype>
 #include <ctime>
 #include <unordered_map>
-#include <fstream> // For file operations
-#include <sstream> // For string stream
+#include <fstream> 
+#include <sstream> 
 #include <vector>
 #include <limits>
 
 
 
-// 🛏️ Utility function definitions
+
 
 void displayAvailableRooms(const std::vector<Room>& rooms) {
     std::cout << "\n"; 
@@ -67,10 +67,10 @@ std::string toLower(const std::string& str) {
 bool isRoomNumberValid(int roomNumber, const std::vector<Room>& rooms) {
     for (const auto& room : rooms) {
         if (room.roomNumber == roomNumber) {
-            return false; // Room number already exists 🚫
+            return false; 
         }
     }
-    return true; // Room number is valid ✅
+    return true; 
 }
 
 void showAdminMenu() {
@@ -96,9 +96,9 @@ bool login(bool isAdminLogin, const std::vector<Customer>& customers) {
     std::cout << "Enter password: ";
     std::cin >> password;
 
-    // Check if it's admin login
+    
     if (isAdminLogin) {
-        // Hardcoded admin credentials
+        
         if (username == "admin" && password == "pass") {
             std::cout << "Admin login successful. Welcome, Admin!\n";
             return true;
@@ -107,9 +107,9 @@ bool login(bool isAdminLogin, const std::vector<Customer>& customers) {
             return false;
         }
     } else {
-        // User login
+        
         for (const auto& customer : customers) {
-            // Make sure to compare username and password correctly
+            
             if (toLower(customer.name) == toLower(username) && customer.password == password) {
                 std::cout << "User login successful. Welcome, " << username << "!\n";
                 return true;
@@ -124,9 +124,9 @@ bool login(bool isAdminLogin, const std::vector<Customer>& customers) {
 
 void signup(std::vector<Customer>& customers) {
     std::string name, contact, password;
-    static int idCounter = customers.size() + 1;  // Adjust to avoid ID collision
+    static int idCounter = customers.size() + 1;  
 
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear the input buffer
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
     std::cout << "Enter your username: ";
     std::getline(std::cin, name);
 
@@ -136,10 +136,10 @@ void signup(std::vector<Customer>& customers) {
     std::cout << "Enter your password: ";
     std::getline(std::cin, password);
 
-    // Add customer to the list
+    
     customers.push_back(Customer(idCounter++, name, contact, password));
 
-    // Save the new customer to the CSV file
+    
     Customer::saveCustomersToFile(customers, "customers.csv");
 
     std::cout << "Welcome, " << name << "! You have been registered successfully.\n";
@@ -202,7 +202,7 @@ void addRoom(std::vector<Room>& rooms) {
 void markRoomAvailable(std::vector<Room>& rooms, std::vector<Booking>& bookings) {
     std::cout << "\n**** Unavailable Rooms ****\n";
     
-    // Display rooms that are unavailable
+    
     bool foundUnavailable = false;
     for (const auto& room : rooms) {
         if (!room.isAvailable) {
@@ -226,20 +226,20 @@ void markRoomAvailable(std::vector<Room>& rooms, std::vector<Booking>& bookings)
     bool roomFound = false;
     for (auto& room : rooms) {
         if (room.roomNumber == roomNumber && !room.isAvailable) {
-            room.isAvailable = true; // Mark room as available
+            room.isAvailable = true; 
             std::cout << "Room " << roomNumber << " is now available ✔️.\n";
             
-            // Remove booking associated with the room
+            
             for (auto it = bookings.begin(); it != bookings.end(); ) {
                 if (it->roomNumber == roomNumber) {
                     std::cout << "Booking for room " << roomNumber << " has been canceled.\n";
-                    it = bookings.erase(it); // Remove booking from the list
+                    it = bookings.erase(it); 
                 } else {
                     ++it;
                 }
             }
             
-            // Update bookings.csv after removing booking
+            
             std::ofstream bookingsFile("bookings.csv");
             if (bookingsFile.is_open()) {
                 for (const auto& booking : bookings) {
@@ -263,7 +263,7 @@ void markRoomAvailable(std::vector<Room>& rooms, std::vector<Booking>& bookings)
         std::cout << "Room number not found or already available ❌.\n";
     }
 
-    // Update rooms.csv file
+    
     std::ofstream roomsFile("rooms.csv");
     if (roomsFile.is_open()) {
         for (const auto& room : rooms) {
@@ -297,11 +297,11 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
     int roomNumber;
     std::string startDate, endDate;
 
-    // Show available rooms
+    
     displayAvailableRooms(rooms);
     std::cout << "\n";
 
-    // Room selection with validation
+    
     std::cout << "Enter the room number you want to book: ";
     std::cin >> roomNumber;
     
@@ -310,8 +310,8 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
     for (auto& room : rooms) {
         if (room.roomNumber == roomNumber && room.isAvailable) {
             roomAvailable = true;
-            roomPrice = room.pricePerNight; // Store price of selected room
-            room.isAvailable = false; // Mark room as booked
+            roomPrice = room.pricePerNight; 
+            room.isAvailable = false; 
             break;
         }
     }
@@ -321,10 +321,10 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
         return;
     }
 
-    // Use logged-in username instead of asking for name
+    
     std::string customerName = userName;
 
-    // Date validation
+    
     std::cout << "Enter start date (YYYY-MM-DD): ";
     std::cin >> startDate;
     
@@ -349,7 +349,7 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
         std::cin >> endDate;
     }
 
-    // Calculate total price
+    
     struct tm tmStart = {0}, tmEnd = {0};
     strptime(startDate.c_str(), "%Y-%m-%d", &tmStart);
     strptime(endDate.c_str(), "%Y-%m-%d", &tmEnd);
@@ -358,18 +358,18 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
     time_t end = mktime(&tmEnd);
     double totalPrice = difftime(end, start) / (60 * 60 * 24) * roomPrice;
 
-    // Generate booking ID
+    
     int bookingId = bookings.size() + 1;
 
-    // Add booking to the bookings vector
+    
     bookings.push_back(Booking(bookingId, roomNumber, customerName, startDate, endDate));
 
-    // Print booking confirmation and receipt
+    
     printBookingConfirmation(bookingId, customerName, roomNumber, 
                               (roomPrice == 100.0 ? "Single" : (roomPrice == 150.0 ? "Double" : "Suite")),
                               startDate, endDate, totalPrice);
 
-    // Update bookings.csv file
+    
     std::ofstream bookingsFile("bookings.csv", std::ios::app);
     if (bookingsFile.is_open()) {
         bookingsFile << customerName << "," << bookingId << "," << roomNumber << "," << startDate << "," << endDate << "\n";
@@ -378,7 +378,7 @@ void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::
         std::cout << "Error opening bookings.csv file.\n";
     }
 
-    // Update rooms.csv file
+    
     std::ofstream roomsFile("rooms.csv");
     if (roomsFile.is_open()) {
         for (const auto& room : rooms) {

@@ -6,20 +6,20 @@
 #include "utils.h"
 
 int main() {
-    // Load data from CSV files
+    
     std::vector<Room> rooms = loadRoomsFromCSV("rooms.csv");
     std::vector<Booking> bookings = Booking::loadBookingsFromCSV("bookings.csv");
     std::vector<Customer> customers = Customer::loadCustomersFromFile("customers.csv");
 
     bool loggedIn = false;
     bool isAdmin = false;
-    std::string username;  // Declare username here so it can be accessed throughout the program
+    std::string username;  
 
     while (true) {
-        std::cout << "\nWelcome to the Hotel Booking System\n";
+        std::cout << "\nWelcome to Izzie's Hotel Booking System\n";
         std::cout << "1. Login as User\n";
         std::cout << "2. Login as Admin\n";
-        std::cout << "3. Sign Up (Normal Users Only)\n";
+        std::cout << "3. Sign Up\n";
         std::cout << "4. Exit\n";
         std::cout << "Enter your choice: ";
 
@@ -27,12 +27,12 @@ int main() {
         std::cin >> actionChoice;
 
         switch (actionChoice) {
-            case 1: {  // Login as User
-                loggedIn = false;  // Reset login state
+            case 1: {  
+                loggedIn = false;  
                 std::string password;
 
                 std::cout << "Enter username: ";
-                std::cin >> username;  // Set the logged-in username
+                std::cin >> username;  
                 std::cout << "Enter password: ";
                 std::cin >> password;
 
@@ -52,7 +52,7 @@ int main() {
                 break;
             }
 
-            case 2: {  // Login as Admin
+            case 2: {  
                 loggedIn = false;
                 std::string password;
 
@@ -71,7 +71,7 @@ int main() {
                 break;
             }
 
-            case 3: {  // Sign Up
+            case 3: {  
                 if (isAdmin) {
                     std::cout << "Admin cannot sign up. Please log in as admin.\n";
                     break;
@@ -83,7 +83,7 @@ int main() {
                 break;
             }
 
-            case 4: {  // Exit
+            case 4: {  
                 std::cout << "Exiting...\n";
                 saveRoomsToCSV("rooms.csv", rooms);
                 Booking::saveBookingsToCSV("bookings.csv", bookings);
@@ -105,21 +105,21 @@ int main() {
                     std::cin >> actionChoice;
 
                     switch (actionChoice) {
-                        case 1:  // Add Room
+                        case 1:  
                             addRoom(rooms);
                             saveRoomsToCSV("rooms.csv", rooms);
                             break;
 
-                        case 2:  // Mark Room Available
+                        case 2:  
                             markRoomAvailable(rooms, bookings);
                             saveRoomsToCSV("rooms.csv", rooms);
                             break;
 
-                        case 3:  // View Available Rooms
+                        case 3:  
                             displayAvailableRooms(rooms);
                             break;
 
-                        case 4:  // Exit Admin Menu
+                        case 4:  
                             std::cout << "Logging out as Admin...\n";
                             isAdmin = false;
                             loggedIn = false;
@@ -130,22 +130,22 @@ int main() {
                             break;
                     }
                 }
-            } else {  // User Menu
+            } else {  
                 while (loggedIn) {
                     showUserMenu();
                     std::cout << "Enter your choice: ";
                     std::cin >> actionChoice;
 
                     switch (actionChoice) {
-                        case 1:  // Make Booking
-                            makeBooking(rooms, bookings, customers, username); // Pass the logged-in user's name
+                        case 1:  
+                            makeBooking(rooms, bookings, customers, username); 
                             break;
 
-                        case 2:  // View Available Rooms
+                        case 2:  
                             displayAvailableRooms(rooms);
                             break;
 
-                        case 3:  // Logout
+                        case 3:  
                             std::cout << "Logging out...\n";
                             loggedIn = false;
                             break;
@@ -161,7 +161,7 @@ int main() {
         }
     }
 
-    // Save data to CSV files before exiting
+    
     saveRoomsToCSV("rooms.csv", rooms);
     Booking::saveBookingsToCSV("bookings.csv", bookings);
     Customer::saveCustomersToFile(customers, "customers.csv");
