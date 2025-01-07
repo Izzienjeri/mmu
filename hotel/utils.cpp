@@ -200,19 +200,42 @@ void addRoom(std::vector<Room>& rooms) {
 }
 
 void markRoomAvailable(std::vector<Room>& rooms) {
-    int roomNumber;
-    std::cout << "Enter room number to mark as available: ";
-    std::cin >> roomNumber;
-
-    for (auto& room : rooms) {
-        if (room.roomNumber == roomNumber) {
-            room.isAvailable = true;
-            std::cout << "Room " << roomNumber << " is now available ✔️.\n";
-            return;
+    std::cout << "\n**** Unavailable Rooms ****\n";
+    
+    // Display rooms that are unavailable
+    bool foundUnavailable = false;
+    for (const auto& room : rooms) {
+        if (!room.isAvailable) {
+            std::cout << "Room Number: " << room.roomNumber 
+                      << ", Type: " << room.type 
+                      << ", Price: Ksh " << room.pricePerNight 
+                      << " 💰 (Unavailable)\n";
+            foundUnavailable = true;
         }
     }
 
-    std::cout << "Room number not found ❌.\n";
+    if (!foundUnavailable) {
+        std::cout << "All rooms are available! 🎉\n";
+        return;
+    }
+
+    int roomNumber;
+    std::cout << "Enter the room number you want to mark as available: ";
+    std::cin >> roomNumber;
+
+    bool roomFound = false;
+    for (auto& room : rooms) {
+        if (room.roomNumber == roomNumber && !room.isAvailable) {
+            room.isAvailable = true;
+            std::cout << "Room " << roomNumber << " is now available ✔️.\n";
+            roomFound = true;
+            break;
+        }
+    }
+
+    if (!roomFound) {
+        std::cout << "Room number not found or already available ❌.\n";
+    }
 }
 
 void printBookingConfirmation(int bookingId, const std::string& customerName, int roomNumber, 
