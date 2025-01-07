@@ -1,108 +1,92 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include "room.h"
 #include "booking.h"
 #include "customer.h"
 #include "utils.h"
 
-void displayAvailableRooms(const std::vector<Room>& rooms) {
-    std::cout << "Available Rooms:\n";
-    bool foundAvailable = false;
-    for (const auto& room : rooms) {
-        if (room.isAvailable) {
-            room.displayDetails();
-            foundAvailable = true;
-        }
+
+const std::string ADMIN_PASSWORD = "Njeri";
+
+
+std::unordered_map<std::string, bool> userDatabase;  
+
+
+bool login() {
+    std::string username, password;
+    std::cout << "Enter username: ";
+    std::cin >> username;
+
+    if (userDatabase.find(username) == userDatabase.end()) {
+        std::cout << "No such account found. Please sign up first.\n";
+        return false;
     }
-    if (!foundAvailable) {
-        std::cout << "No rooms are available at the moment.\n";
+
+    std::cout << "Enter password: ";
+    std::cin >> password;
+
+    
+    if (password == ADMIN_PASSWORD && userDatabase[username]) {
+        std::cout << "Login successful as Admin.\n";
+        return true;  
+    } else if (password != ADMIN_PASSWORD && !userDatabase[username]) {
+        std::cout << "Login successful as User.\n";
+        return false;  
+    } else {
+        std::cout << "Incorrect password.\n";
+        return false;  
     }
 }
 
-bool isRoomNumberValid(int roomNumber, const std::vector<Room>& rooms) {
-    for (const auto& room : rooms) {
-        if (room.roomNumber == roomNumber) {
-            return false; // Room number already exists
-        }
-    }
-    return true;
-}
 
-void makeBooking(std::vector<Room>& rooms, std::vector<Booking>& bookings, std::vector<Customer>& customers) {
-    int roomNumber;
-    std::string customerName, startDate, endDate;
+void signup() {
+    std::string username, password;
+    std::cout << "Enter new username: ";
+    std::cin >> username;
 
-    // Show available rooms
-    displayAvailableRooms(rooms);
-
-    std::cout << "\n";
-
-    // Room selection with validation
-    std::cout << "Enter the room number you want to book: ";
-    std::cin >> roomNumber;
-
-    bool roomAvailable = false;
-    for (auto& room : rooms) {
-        if (room.roomNumber == roomNumber && room.isAvailable) {
-            roomAvailable = true;
-            room.isAvailable = false; // Mark room as booked
-            break;
-        }
-    }
-
-    if (!roomAvailable) {
-        std::cout << "Sorry, the room is not available. Please select another room.\n";
+    
+    if (userDatabase.find(username) != userDatabase.end()) {
+        std::cout << "Username already exists. Please choose another one.\n";
         return;
     }
 
-    // Customer details input
-    std::cout << "Enter customer name: ";
-    std::cin >> customerName;
+    std::cout << "Enter password: ";
+    std::cin >> password;
 
-    // Date validation (Start Date)
-    while (true) {
-        std::cout << "Enter start date (YYYY-MM-DD): ";
-        std::cin >> startDate;
-
-        if (!isDateValid(startDate)) {
-            std::cout << "Invalid date format! Please use YYYY-MM-DD format. Try again: ";
-        } else if (isDateInPast(startDate)) {
-            std::cout << "The start date cannot be in the past. Please enter a valid start date.\n";
-        } else {
-            break; // Exit loop if date is valid
-        }
+    if (password == ADMIN_PASSWORD) {
+        userDatabase[username] = true;  
+        std::cout << "Admin account created successfully.\n";
+    } else {
+        userDatabase[username] = false;  
+        std::cout << "User account created successfully.\n";
     }
-
-    // Date validation (End Date)
-    while (true) {
-        std::cout << "Enter end date (YYYY-MM-DD): ";
-        std::cin >> endDate;
-
-        if (!isDateValid(endDate)) {
-            std::cout << "Invalid date format! Please use YYYY-MM-DD format. Try again: ";
-        } else if (isDateInPast(endDate)) {
-            std::cout << "The end date cannot be in the past. Please enter a valid end date.\n";
-        } else if (!isEndDateAfterStartDate(startDate, endDate)) {
-            std::cout << "End date must be after the start date. Please enter valid dates.\n";
-        } else {
-            break; // Exit loop if date is valid
-        }
-    }
-
-    // Add customer and booking
-    int bookingId = bookings.size() + 1;
-    int customerId = customers.size() + 1;
-    customers.push_back(Customer(customerId, customerName, "Unknown"));
-    bookings.push_back(Booking(bookingId, roomNumber, customerName, startDate, endDate));
-    std::cout << "Booking confirmed!\n";
 }
+
+
+void showAdminMenu() {
+    std::cout << "\nAdmin Menu:\n";
+    std::cout << "1. Add Room\n";
+    std::cout << "2. Mark Room Available\n";
+    std::cout << "3. View Available Rooms\n";
+    std::cout << "4. Exit\n";
+}
+
+
+void showUserMenu() {
+    std::cout << "\nUser Menu:\n";
+    std::cout << "1. Make Booking\n";
+    std::cout << "2. View Available Rooms\n";
+    std::cout << "3. Exit\n";
+}
+
 
 void addRoom(std::vector<Room>& rooms) {
     int roomNumber;
     std::string type;
     double price;
 
-    // Room Number Validation
+    
     while (true) {
         std::cout << "Enter room number: ";
         std::cin >> roomNumber;
@@ -115,7 +99,7 @@ void addRoom(std::vector<Room>& rooms) {
         }
     }
 
-    // Room Type Selection
+    
     std::cout << "Select room type:\n";
     std::cout << "1. Single\n";
     std::cout << "2. Double\n";
@@ -137,7 +121,7 @@ void addRoom(std::vector<Room>& rooms) {
         }
     }
 
-    // Room Price Validation
+    
     while (true) {
         std::cout << "Enter room price per night (positive value): Ksh ";
         std::cin >> price;
@@ -148,9 +132,26 @@ void addRoom(std::vector<Room>& rooms) {
         }
     }
 
-    // Add room to the rooms vector
+    
     rooms.push_back(Room(roomNumber, type, price, true));
     std::cout << "Room added successfully!\n";
+}
+
+
+void markRoomAvailable(std::vector<Room>& rooms) {
+    int roomNumber;
+    std::cout << "Enter room number to mark as available: ";
+    std::cin >> roomNumber;
+
+    for (auto& room : rooms) {
+        if (room.roomNumber == roomNumber) {
+            room.isAvailable = true;
+            std::cout << "Room " << roomNumber << " is now available.\n";
+            return;
+        }
+    }
+
+    std::cout << "Room number not found.\n";
 }
 
 int main() {
@@ -158,7 +159,7 @@ int main() {
     std::vector<Booking> bookings;
     std::vector<Customer> customers;
 
-    // Adding predefined rooms
+    
     rooms.push_back(Room(101, "Single", 100.0, true));
     rooms.push_back(Room(102, "Double", 150.0, true));
     rooms.push_back(Room(103, "Suite", 200.0, true));
@@ -166,34 +167,107 @@ int main() {
     rooms.push_back(Room(105, "Double", 180.0, true));
     rooms.push_back(Room(106, "Suite", 250.0, true));
 
-    int choice;
+    int actionChoice;
+    bool loggedIn = false;
+    bool isAdmin = false;
+
     while (true) {
-        std::cout << "\nMenu:\n";
-        std::cout << "1. Add Room\n2. Make Booking\n3. View Available Rooms\n4. Exit\n";
-        std::cout << "\n";
+        std::cout << "\nWelcome to Hotel Booking System\n";
+        std::cout << "1. Login\n";
+        std::cout << "2. Login as Admin\n";
+        std::cout << "3. Sign Up\n";
+        std::cout << "4. Exit\n";
         std::cout << "Enter your choice: ";
-        std::cin >> choice;
+        std::cin >> actionChoice;
 
-        switch (choice) {
-            case 1:
-                addRoom(rooms);  // Add Room functionality with prompts and validation
+        switch (actionChoice) {
+            case 1: 
+                loggedIn = login();
+                if (loggedIn) {
+                    isAdmin = false;  
+                    std::cout << "You are logged in as a user.\n";
+                }
                 break;
 
-            case 2:
-                makeBooking(rooms, bookings, customers);
+            case 2: 
+                loggedIn = login();
+                if (loggedIn) {
+                    isAdmin = true;  
+                    std::cout << "You are logged in as an admin.\n";
+                }
                 break;
 
-            case 3:
-                std::cout << "\n";
-                displayAvailableRooms(rooms);
+            case 3: 
+                signup();
                 break;
 
-            case 4:
+            case 4: 
                 std::cout << "Exiting...\n";
                 return 0;
 
             default:
-                std::cout << "Invalid choice, please try again.\n";
+                std::cout << "Invalid choice. Please try again.\n";
+                continue;
+        }
+
+        
+        if (!loggedIn) {
+            std::cout << "You need to log in first.\n";
+            continue;  
+        }
+
+        if (loggedIn && !isAdmin) {
+            
+            showUserMenu();
+            std::cout << "Enter your choice: ";
+            std::cin >> actionChoice;
+
+            switch (actionChoice) {
+                case 1:
+                    
+                    break;
+
+                case 2:
+                    
+                    displayAvailableRooms(rooms);
+                    break;
+
+                case 3:
+                    std::cout << "Exiting...\n";
+                    return 0;
+
+                default:
+                    std::cout << "Invalid choice. Please try again.\n";
+                    continue;
+            }
+        } else if (loggedIn && isAdmin) {
+            
+            showAdminMenu();
+            std::cout << "Enter your choice: ";
+            std::cin >> actionChoice;
+
+            switch (actionChoice) {
+                case 1:
+                    addRoom(rooms);
+                    break;
+
+                case 2:
+                    markRoomAvailable(rooms);
+                    break;
+
+                case 3:
+                    
+                    displayAvailableRooms(rooms);
+                    break;
+
+                case 4:
+                    std::cout << "Exiting...\n";
+                    return 0;
+
+                default:
+                    std::cout << "Invalid choice. Please try again.\n";
+                    continue;
+            }
         }
     }
 

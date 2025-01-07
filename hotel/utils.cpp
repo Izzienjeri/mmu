@@ -45,3 +45,25 @@ std::string toLower(const std::string& str) {
     }
     return result;
 }
+
+bool isRoomNumberValid(int roomNumber, const std::vector<Room>& rooms) {
+    for (const auto& room : rooms) {
+        if (room.roomNumber == roomNumber) {
+            return false; // Room number already exists
+        }
+    }
+    return true; // Room number is valid
+}
+
+void displayAvailableRooms(const std::vector<Room>& rooms) {
+    std::cout << "Available Rooms:\n";
+    for (const auto& room : rooms) {
+        if (room.isAvailable) {
+            std::cout << "Room Number: " << room.roomNumber 
+                      << ", Type: " << room.type 
+                      << ", Price: Ksh " << room.pricePerNight 
+                      << "\n";
+        }
+    }
+}
+
